@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LvxingtuanOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.lvxingtuan_id as lvxingtuanId
+        ,a.yonghu_id as yonghuId
+        ,a.lvxingtuan_order_start_time as lvxingtuanOrderStartTime
+        ,a.lvxingtuan_order_end_time as lvxingtuanOrderEndTime
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LvxingtuanOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,lvxingtuan.lvxingshe_id as lvxingsheId
+        ,lvxingtuan.lvxingtuan_name as lvxingtuanName
+        ,lvxingtuan.jiudian_shijian as jiudianShijian
+        ,lvxingtuan.lvxingtuan_photo as lvxingtuanPhoto
+        ,lvxingtuan.lvxingtuan_money as lvxingtuanMoney
+        ,lvxingtuan.lvxingtuan_content as lvxingtuanContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.sex_types as sexTypes
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.new_money as newMoney
+
+        FROM lvxingtuan_order  a
+        left JOIN lvxingtuan lvxingtuan ON a.lvxingtuan_id = lvxingtuan.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.lvxingtuanId != null">
+                and a.lvxingtuan_id = #{params.lvxingtuanId}
+            </if>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.lvxingtuanOrderStartTimeStart != '' and params.lvxingtuanOrderStartTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.lvxingtuan_order_start_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.lvxingtuanOrderStartTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.lvxingtuanOrderStartTimeEnd != '' and params.lvxingtuanOrderStartTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.lvxingtuan_order_start_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.lvxingtuanOrderStartTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.lvxingtuanOrderEndTimeStart != '' and params.lvxingtuanOrderEndTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.lvxingtuan_order_end_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.lvxingtuanOrderEndTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.lvxingtuanOrderEndTimeEnd != '' and params.lvxingtuanOrderEndTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.lvxingtuan_order_end_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.lvxingtuanOrderEndTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test="params.lvxingsheId != null">
+                and lvxingtuan.lvxingshe_id = #{params.lvxingsheId}
+            </if>
+            <if test="params.lvxingtuanNameStart != null ">
+                <![CDATA[  and lvxingtuan.lvxingtuan_name >= #{params.lvxingtuanNameStart}   ]]>
+            </if>
+            <if test="params.lvxingtuanNameEnd != null ">
+                <![CDATA[  and lvxingtuan.lvxingtuan_name <= #{params.lvxingtuanNameEnd}   ]]>
+            </if>
+            <if test="params.jiudianShijianStart != null ">
+                <![CDATA[  and lvxingtuan.jiudian_shijian >= #{params.jiudianShijianStart}   ]]>
+            </if>
+            <if test="params.jiudianShijianEnd != null ">
+                <![CDATA[  and lvxingtuan.jiudian_shijian <= #{params.jiudianShijianEnd}   ]]>
+            </if>
+            <if test="params.lvxingtuanMoneyStart != null ">
+                <![CDATA[  and lvxingtuan.lvxingtuan_money >= #{params.lvxingtuanMoneyStart}   ]]>
+            </if>
+            <if test="params.lvxingtuanMoneyEnd != null ">
+                <![CDATA[  and lvxingtuan.lvxingtuan_money <= #{params.lvxingtuanMoneyEnd}   ]]>
+            </if>
+            <if test=" params.lvxingtuanContent != '' and params.lvxingtuanContent != null and params.lvxingtuanContent != 'null' ">
+                and lvxingtuan.lvxingtuan_content like CONCAT('%',#{params.lvxingtuanContent},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

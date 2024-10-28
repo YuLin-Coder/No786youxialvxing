@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LvxingtuanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.lvxingshe_id as lvxingsheId
+        ,a.lvxingtuan_name as lvxingtuanName
+        ,a.jiudian_shijian as jiudianShijian
+        ,a.lvxingtuan_photo as lvxingtuanPhoto
+        ,a.lvxingtuan_money as lvxingtuanMoney
+        ,a.lvxingtuan_content as lvxingtuanContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LvxingtuanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,lvxingshe.lvxingshe_name as lvxingsheName
+        ,lvxingshe.lvxingshe_photo as lvxingshePhoto
+        ,lvxingshe.new_money as newMoney
+
+        FROM lvxingtuan  a
+        left JOIN lvxingshe lvxingshe ON a.lvxingshe_id = lvxingshe.id
+
+        <where>
+            <if test="params.lvxingsheId != null">
+                and a.lvxingshe_id = #{params.lvxingsheId}
+            </if>
+            <if test="params.lvxingtuanNameStart != null">
+                <![CDATA[  and a.lvxingtuan_name >= #{params.lvxingtuanNameStart}   ]]>
+            </if>
+            <if test="params.lvxingtuanNameEnd != null">
+                <![CDATA[  and a.lvxingtuan_name <= #{params.lvxingtuanNameEnd}   ]]>
+            </if>
+            <if test="params.jiudianShijianStart != null">
+                <![CDATA[  and a.jiudian_shijian >= #{params.jiudianShijianStart}   ]]>
+            </if>
+            <if test="params.jiudianShijianEnd != null">
+                <![CDATA[  and a.jiudian_shijian <= #{params.jiudianShijianEnd}   ]]>
+            </if>
+            <if test="params.lvxingtuanMoneyStart != null ">
+                <![CDATA[  and a.lvxingtuan_money >= #{params.lvxingtuanMoneyStart}   ]]>
+            </if>
+            <if test="params.lvxingtuanMoneyEnd != null ">
+                <![CDATA[  and a.lvxingtuan_money <= #{params.lvxingtuanMoneyEnd}   ]]>
+            </if>
+            <if test=" params.lvxingtuanContent != '' and params.lvxingtuanContent != null and params.lvxingtuanContent != 'null' ">
+                and a.lvxingtuan_content like CONCAT('%',#{params.lvxingtuanContent},'%')
+            </if>
+
+            <if test=" params.lvxingsheName != '' and params.lvxingsheName != null and params.lvxingsheName != 'null' ">
+                and lvxingshe.lvxingshe_name like CONCAT('%',#{params.lvxingsheName},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and lvxingshe.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and lvxingshe.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

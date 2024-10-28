@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ChepiaoOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.chepiao_id as chepiaoId
+        ,a.yonghu_id as yonghuId
+        ,a.chepiao_order_start_time as chepiaoOrderStartTime
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ChepiaoOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,chepiao.chepiao_name as chepiaoName
+        ,chepiao.chepiao_types as chepiaoTypes
+        ,chepiao.chepiao_chufadi as chepiaoChufadi
+        ,chepiao.chepiao_mudidi as chepiaoMudidi
+        ,chepiao.chepiao_photo as chepiaoPhoto
+        ,chepiao.chepiao_money as chepiaoMoney
+        ,chepiao.chepiao_content as chepiaoContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.sex_types as sexTypes
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.new_money as newMoney
+
+        FROM chepiao_order  a
+        left JOIN chepiao chepiao ON a.chepiao_id = chepiao.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.chepiaoId != null">
+                and a.chepiao_id = #{params.chepiaoId}
+            </if>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.chepiaoOrderStartTimeStart != '' and params.chepiaoOrderStartTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.chepiao_order_start_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.chepiaoOrderStartTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.chepiaoOrderStartTimeEnd != '' and params.chepiaoOrderStartTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.chepiao_order_start_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.chepiaoOrderStartTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test=" params.chepiaoName != '' and params.chepiaoName != null and params.chepiaoName != 'null' ">
+                and chepiao.chepiao_name like CONCAT('%',#{params.chepiaoName},'%')
+            </if>
+            <if test="params.chepiaoTypes != null">
+                and chepiao.chepiao_types = #{params.chepiaoTypes}
+            </if>
+
+            <if test=" params.chepiaoChufadi != '' and params.chepiaoChufadi != null and params.chepiaoChufadi != 'null' ">
+                and chepiao.chepiao_chufadi like CONCAT('%',#{params.chepiaoChufadi},'%')
+            </if>
+            <if test=" params.chepiaoMudidi != '' and params.chepiaoMudidi != null and params.chepiaoMudidi != 'null' ">
+                and chepiao.chepiao_mudidi like CONCAT('%',#{params.chepiaoMudidi},'%')
+            </if>
+            <if test="params.chepiaoMoneyStart != null ">
+                <![CDATA[  and chepiao.chepiao_money >= #{params.chepiaoMoneyStart}   ]]>
+            </if>
+            <if test="params.chepiaoMoneyEnd != null ">
+                <![CDATA[  and chepiao.chepiao_money <= #{params.chepiaoMoneyEnd}   ]]>
+            </if>
+            <if test=" params.chepiaoContent != '' and params.chepiaoContent != null and params.chepiaoContent != 'null' ">
+                and chepiao.chepiao_content like CONCAT('%',#{params.chepiaoContent},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

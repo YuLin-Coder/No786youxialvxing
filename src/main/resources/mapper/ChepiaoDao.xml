@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ChepiaoDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.chepiao_name as chepiaoName
+        ,a.chepiao_types as chepiaoTypes
+        ,a.chepiao_chufadi as chepiaoChufadi
+        ,a.chepiao_mudidi as chepiaoMudidi
+        ,a.chepiao_photo as chepiaoPhoto
+        ,a.chepiao_money as chepiaoMoney
+        ,a.chepiao_content as chepiaoContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ChepiaoView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM chepiao  a
+
+        <where>
+            <if test=" params.chepiaoName != '' and params.chepiaoName != null and params.chepiaoName != 'null' ">
+                and a.chepiao_name like CONCAT('%',#{params.chepiaoName},'%')
+            </if>
+            <if test="params.chepiaoTypes != null">
+                and a.chepiao_types = #{params.chepiaoTypes}
+            </if>
+            <if test=" params.chepiaoChufadi != '' and params.chepiaoChufadi != null and params.chepiaoChufadi != 'null' ">
+                and a.chepiao_chufadi like CONCAT('%',#{params.chepiaoChufadi},'%')
+            </if>
+            <if test=" params.chepiaoMudidi != '' and params.chepiaoMudidi != null and params.chepiaoMudidi != 'null' ">
+                and a.chepiao_mudidi like CONCAT('%',#{params.chepiaoMudidi},'%')
+            </if>
+            <if test="params.chepiaoMoneyStart != null ">
+                <![CDATA[  and a.chepiao_money >= #{params.chepiaoMoneyStart}   ]]>
+            </if>
+            <if test="params.chepiaoMoneyEnd != null ">
+                <![CDATA[  and a.chepiao_money <= #{params.chepiaoMoneyEnd}   ]]>
+            </if>
+            <if test=" params.chepiaoContent != '' and params.chepiaoContent != null and params.chepiaoContent != 'null' ">
+                and a.chepiao_content like CONCAT('%',#{params.chepiaoContent},'%')
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
